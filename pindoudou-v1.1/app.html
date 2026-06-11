@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼豆图纸生成器 - 创作工具</title>
+    <link rel="stylesheet" href="css/app.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="custom-cursor"></div>
+
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🫘</span>
+                <span class="logo-text">拼豆助手</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">首页</a>
+                <a href="app.html" class="active">创作工具</a>
+                <a href="privacy.html">隐私政策</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🎨 拼豆图纸生成器</h1>
+            <p>上传图片或自由手绘，一键生成专业拼豆图纸</p>
+        </header>
+
+        <div class="mode-switcher">
+            <button id="mode-upload" class="mode-btn active">
+                <span class="mode-icon">📷</span> 图片转换
+            </button>
+            <button id="mode-draw" class="mode-btn">
+                <span class="mode-icon">✏️</span> 自由手绘
+            </button>
+        </div>
+
+        <main>
+            <section id="upload-section" class="mode-panel">
+                <div class="upload-area" id="drop-zone">
+                    <input type="file" id="file-input" accept="image/*" hidden>
+                    <div class="upload-prompt">
+                        <span class="upload-icon">📂</span>
+                        <p>拖拽图片到这里，或 <strong>点击上传</strong></p>
+                        <small>支持 JPG / PNG / WEBP</small>
+                    </div>
+                </div>
+                <div class="controls" id="upload-controls" style="display: none;">
+                    <div class="control-group">
+                        <label>目标宽度 (颗):</label>
+                        <input type="number" id="width-input" value="29" min="10" max="150">
+                        <small>标准模板29颗，大图建议58-120</small>
+                    </div>
+                    <div class="control-group">
+                        <label>品牌色号:</label>
+                        <select id="brand-select">
+                            <option value="MARD">MARD（字母+数字）</option>
+                            <option value="COCO">COCO（字母+数字）</option>
+                            <option value="漫漫">漫漫（字母+数字）</option>
+                            <option value="盼盼">盼盼（纯数字）</option>
+                            <option value="咪小窝">咪小窝（纯数字）</option>
+                            <option value="Perler">Perler（纯数字）</option>
+                            <option value="Artkal">Artkal（S+数字）</option>
+                            <option value="Hama">Hama（H+数字）</option>
+                        </select>
+                        <small>选择你使用的拼豆品牌</small>
+                    </div>
+                    <button id="convert-btn" class="btn-primary">✨ 开始转换</button>
+                </div>
+            </section>
+
+            <section id="draw-section" class="mode-panel" style="display: none;">
+                <div class="draw-setup">
+                    <div class="control-group">
+                        <label>宽度:</label>
+                        <input type="number" id="draw-width" value="29" min="5" max="100">
+                    </div>
+                    <div class="control-group">
+                        <label>高度:</label>
+                        <input type="number" id="draw-height" value="29" min="5" max="100">
+                    </div>
+                    <button id="init-draw-btn" class="btn-primary">📋 创建空白画布</button>
+                </div>
+            </section>
+
+            <section class="output-area" id="output-area" style="display: none;">
+                <div class="editor-toolbar">
+                    <div class="toolbar-row">
+                        <div id="palette" class="palette-grid"></div>
+                    </div>
+
+                    <div class="toolbar-row tool-controls">
+                        <div class="current-color-box">
+                            <span>当前颜色:</span>
+                            <div id="current-color-show" class="current-swatch"></div>
+                        </div>
+
+                        <div class="tool-buttons">
+                            <button id="tool-pen" class="tool-btn active">✏️ <span>画笔</span></button>
+                            <button id="tool-eraser" class="tool-btn">🧽 <span>橡皮擦</span></button>
+                            <button id="tool-hand" class="tool-btn">✋ <span>抓手</span></button>
+                            <button id="tool-undo" class="tool-btn">↩️ <span>撤回</span></button>
+                        </div>
+
+                        <div class="brush-size-box">
+                            <label>笔刷:</label>
+                            <input type="range" id="brush-size" min="1" max="5" value="1">
+                            <span id="size-val" class="size-display">1</span>
+                        </div>
+                    </div>
+
+                    <!-- 🆕 智能优化工具栏 -->
+                    <div class="toolbar-row optimize-controls">
+                        <span class="view-label">🧹 智能优化：</span>
+                        <button id="btn-merge" class="mini-btn">🔄 颜色合并</button>
+                        <div class="merge-threshold-box">
+                            <label>阈值:</label>
+                            <input type="range" id="merge-threshold" min="20" max="150" value="60">
+                            <span id="merge-threshold-val">60</span>
+                        </div>
+                        <button id="btn-denoise" class="mini-btn">🧹 去除杂色</button>
+                        <button id="btn-bg-remove" class="mini-btn">🖼️ 自动去背景</button>
+                        <button id="btn-reset-exclude" class="mini-btn">♻️ 重置排除</button>
+                    </div>
+
+                    <div class="toolbar-row view-controls">
+                        <div class="view-mode-group">
+                            <span class="view-label">预览模式：</span>
+                            <button class="mini-btn active" data-preview-mode="pegboard">模板预览</button>
+                            <button class="mini-btn" data-preview-mode="bead">圆豆预览</button>
+                            <button class="mini-btn" data-preview-mode="flat">纯色预览</button>
+                        </div>
+
+                        <div class="view-mode-group">
+                            <span class="view-label">图纸模式：</span>
+                            <button class="mini-btn active" data-pattern-mode="bead">圆豆图纸</button>
+                            <button class="mini-btn" data-pattern-mode="grid">方格图纸</button>
+                        </div>
+                    </div>
+
+                    <div class="toolbar-row export-controls">
+                        <div class="export-setting">
+                            <label>网格大小:</label>
+                            <select id="grid-size">
+                                <option value="5mm" selected>5mm (标准豆)</option>
+                                <option value="2.6mm">2.6mm (迷你豆)</option>
+                            </select>
+                        </div>
+
+                        <div class="export-setting">
+                            <label>导出质量:</label>
+                            <select id="export-quality">
+                                <option value="standard">标准</option>
+                                <option value="hd" selected>高清</option>
+                                <option value="ultra">超清</option>
+                            </select>
+                        </div>
+
+                        <div class="export-setting">
+                            <label>图纸编号:</label>
+                            <select id="export-show-symbols">
+                                <option value="yes" selected>显示</option>
+                                <option value="no">隐藏</option>
+                            </select>
+                        </div>
+
+                        <div class="export-setting">
+                            <label>网格:</label>
+                            <select id="export-show-grid">
+                                <option value="yes" selected>显示</option>
+                                <option value="no">隐藏</option>
+                            </select>
+                        </div>
+
+                        <div class="export-setting">
+                            <label>红线:</label>
+                            <select id="export-show-guides">
+                                <option value="yes" selected>显示</option>
+                                <option value="no">隐藏</option>
+                            </select>
+                        </div>
+
+                        <div class="export-setting">
+                            <label>统计栏:</label>
+                            <select id="export-show-legend">
+                                <option value="yes" selected>显示</option>
+                                <option value="no">隐藏</option>
+                            </select>
+                        </div>
+
+                        <div class="export-setting">
+                            <label>打印友好:</label>
+                            <select id="export-print-friendly">
+                                <option value="no" selected>关闭</option>
+                                <option value="yes">开启</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="preview-container">🖼️ 预览</button>
+                    <button class="tab-btn" data-tab="pattern-container">📋 专业图纸</button>
+                    <button class="tab-btn" data-tab="list-container">📊 用量清单</button>
+                </div>
+
+                <input type="number" id="preview-zoom" value="14" hidden>
+                <input type="number" id="pattern-zoom" value="16" hidden>
+
+                <div id="preview-container" class="tab-content">
+                    <div class="scroll-wrapper" id="preview-wrapper">
+                        <canvas id="preview-canvas"></canvas>
+                    </div>
+                </div>
+
+                <div id="pattern-container" class="tab-content" style="display:none;">
+                    <div class="scroll-wrapper" id="pattern-wrapper">
+                        <canvas id="pattern-canvas"></canvas>
+                    </div>
+                </div>
+
+                <div id="list-container" class="tab-content" style="display:none;">
+                    <div class="table-wrapper">
+                        <table id="bead-list">
+                            <thead>
+                                <tr><th>色块</th><th>代码</th><th>名称</th><th>数量</th><th>操作</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button id="download-btn" class="btn-primary">⬇️ 导出 PNG</button>
+                    <button id="export-svg-btn" class="btn-secondary">🧾 导出 SVG</button>
+                    <button id="export-json-btn" class="btn-secondary">🗂️ 导出 JSON</button>
+                    <button id="export-pdf-btn" class="btn-secondary">📕 导出 PDF</button>
+                    <button id="print-a4-btn" class="btn-secondary">🖨️ 打印</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <a href="index.html">首页</a>
+            <a href="privacy.html">隐私政策</a>
+            <p>© 2026 拼豆设计助手</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

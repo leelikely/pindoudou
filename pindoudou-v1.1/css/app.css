@@ -596,6 +596,34 @@ tbody tr:hover { background: #FFF5F5; }
     color: #e8964a;
 }
 
+.step-btn {
+    width: 22px;
+    height: 22px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    background: #f8f8f8;
+    color: #555;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.step-btn:hover {
+    background: #e8964a;
+    color: #fff;
+    border-color: #e8964a;
+}
+
+.step-btn:active {
+    transform: scale(0.92);
+}
+
 /* ========== 颜色排除按钮 ========== */
 .exclude-btn {
     padding: 3px 10px;

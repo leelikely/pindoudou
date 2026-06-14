@@ -52,7 +52,7 @@
                 <div class="controls" id="upload-controls" style="display: none;">
                     <div class="control-group">
                         <label>目标宽度 (颗):</label>
-                        <input type="number" id="width-input" value="29" min="10" max="150">
+                        <input type="number" id="width-input" value="58" min="10" max="150">
                         <small>标准模板29颗，大图建议58-120</small>
                     </div>
                     <div class="control-group">
@@ -68,6 +68,20 @@
                             <option value="Hama">Hama（H+数字）</option>
                         </select>
                         <small>选择你使用的拼豆品牌</small>
+                    </div>
+                    <div class="control-group" id="subset-group">
+                        <label>色号规格:</label>
+                        <select id="subset-select">
+                            <option value="all">所有颜色（291色）</option>
+                            <option value="221">221色</option>
+                            <option value="144">144色</option>
+                            <option value="120">120色</option>
+                            <option value="96">96色</option>
+                            <option value="72">72色</option>
+                            <option value="48">48色</option>
+                            <option value="24">24色</option>
+                        </select>
+                        <small>选择你拥有的 MARD 套装规格</small>
                     </div>
                     <button id="convert-btn" class="btn-primary">✨ 开始转换</button>
                 </div>
@@ -119,8 +133,10 @@
                         <button id="btn-merge" class="mini-btn">🔄 颜色合并</button>
                         <div class="merge-threshold-box">
                             <label>阈值:</label>
-                            <input type="range" id="merge-threshold" min="20" max="150" value="60">
-                            <span id="merge-threshold-val">60</span>
+                            <button class="step-btn" id="merge-step-down">−</button>
+                            <input type="range" id="merge-threshold" min="0" max="100" value="0">
+                            <button class="step-btn" id="merge-step-up">+</button>
+                            <span id="merge-threshold-val">0</span>
                         </div>
                         <button id="btn-denoise" class="mini-btn">🧹 去除杂色</button>
                         <button id="btn-bg-remove" class="mini-btn">🖼️ 自动去背景</button>

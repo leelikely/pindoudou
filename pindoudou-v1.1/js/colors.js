@@ -337,5 +337,126 @@ export function buildPalette(brand = "MARD") {
 
 
 
+// ============================================
+// MARD 品牌色号子集定义（基于官方套装规格）
+// 数据来源：pixel-beads.com MARD 色卡
+// ============================================
+
+// 辅助：生成 "X1" ~ "Xnn" 的色号数组（补零对齐，如 A01）
+function rangeCodes(prefix, from, to, pad = true) {
+    const codes = [];
+    for (let i = from; i <= to; i++) {
+        codes.push(pad ? prefix + String(i).padStart(2, '0') : prefix + i);
+    }
+    return codes;
+}
+
+export const MARD_SUBSET_DEFINITIONS = {
+    "24": [
+        "A04","A06","A07",
+        "B03","B05","B08",
+        "C03","C05","C08",
+        "D06","D07","D09",
+        "E02","E04",
+        "F05",
+        "G01","G05","G07",
+        "H01","H02","H03","H04","H05","H07",
+    ],
+    "48": [
+        "A04","A06","A07","A10","A11","A13",
+        "B03","B05","B08","B12",
+        "C02","C03","C05","C06","C07","C08","C10","C11","C13",
+        "D03","D06","D07","D09","D13","D15","D18","D19","D21",
+        "E02","E03","E04","E07","E08",
+        "F05","F08","F13",
+        "G01","G05","G07","G08","G09","G13",
+        "H01","H02","H03","H04","H05","H07",
+    ],
+    "72": [
+        "A03","A04","A06","A07","A10","A11","A13",
+        "B03","B05","B07","B08","B10","B12","B14","B17","B18","B19","B20",
+        "C02","C03","C05","C06","C07","C08","C10","C11","C13","C16",
+        "D02","D03","D06","D07","D08","D09","D11","D12","D13","D14","D15","D16","D18","D19","D20","D21",
+        "E01","E02","E03","E04","E05","E07","E08","E12","E13",
+        "F05","F07","F08","F10","F13",
+        "G01","G02","G03","G05","G07","G08","G09","G13",
+        "H01","H02","H03","H04","H05","H07",
+    ],
+    "96": [
+        "A03","A04","A06","A07","A10","A11","A13","A14",
+        "B03","B05","B07","B08","B10","B12","B14","B17","B18","B19","B20",
+        "C02","C03","C05","C06","C07","C08","C10","C11","C13","C16",
+        "D02","D03","D05","D06","D07","D08","D09","D11","D12","D13","D14","D15","D16","D18","D19","D20","D21",
+        ...rangeCodes("E",1,15),
+        ...rangeCodes("F",1,14),
+        "G01","G02","G03","G05","G07","G08","G09","G13","G14","G17",
+        "H01","H02","H03","H04","H05","H06","H07",
+        "M05","M06","M09","M12",
+    ],
+    "120": [
+        "A01","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12","A13","A14","A15",
+        "B01","B02","B03","B04","B05","B06","B07","B08","B10","B12","B13","B14","B15","B16","B17","B18","B19","B20",
+        "C01","C02","C03","C04","C05","C06","C07","C08","C09","C10","C11","C13","C14","C15","C16","C17",
+        "D01","D02","D03","D05","D06","D07","D08","D09","D11","D12","D13","D14","D15","D16","D17","D18","D19","D20","D21",
+        ...rangeCodes("E",1,15),
+        ...rangeCodes("F",1,14),
+        "G01","G02","G03","G05","G06","G07","G08","G09","G13","G14","G17",
+        "H01","H02","H03","H04","H05","H06","H07","H12",
+        "M05","M06","M09","M12",
+    ],
+    "144": [
+        ...rangeCodes("A",1,15),
+        ...rangeCodes("B",1,20),
+        ...rangeCodes("C",1,17),
+        ...rangeCodes("D",1,21),
+        ...rangeCodes("E",1,15),
+        ...rangeCodes("F",1,14),
+        ...rangeCodes("G",1,17),
+        ...rangeCodes("H",1,14),
+        ...rangeCodes("M",1,15),
+    ],
+    "221": [
+        ...rangeCodes("A",1,26),
+        ...rangeCodes("B",1,32),
+        ...rangeCodes("C",1,29),
+        ...rangeCodes("D",1,26),
+        ...rangeCodes("E",1,24),
+        ...rangeCodes("F",1,25),
+        ...rangeCodes("G",1,21),
+        ...rangeCodes("H",1,14),
+        ...rangeCodes("H",16,23),
+        ...rangeCodes("M",1,15),
+    ],
+};
+
+// 获取 MARD 子集选项列表
+export function getMardSubsetOptions() {
+    return [
+        { value: "all", label: "所有颜色（291色）" },
+        { value: "221", label: "221色" },
+        { value: "144", label: "144色" },
+        { value: "120", label: "120色" },
+        { value: "96", label: "96色" },
+        { value: "72", label: "72色" },
+        { value: "48", label: "48色" },
+        { value: "24", label: "24色" },
+    ];
+}
+
+// 根据品牌和子集规格构建色盘
+export function buildSubsetPalette(brand = "MARD", subsetSize = "all") {
+    const fullPalette = buildPalette(brand);
+
+    if (brand !== "MARD" || subsetSize === "all") {
+        return fullPalette;
+    }
+
+    const allowedCodes = MARD_SUBSET_DEFINITIONS[subsetSize];
+    if (!allowedCodes) return fullPalette;
+
+    const codeSet = new Set(allowedCodes);
+    return fullPalette.filter(c => codeSet.has(c.symbol));
+}
+
 // 兼容旧版：默认使用 MARD 品牌
 export const PERLER_COLORS = buildPalette("MARD");

@@ -1149,25 +1149,31 @@ function convertSourceImage() {
     const w = parseInt(widthInput?.value || '58', 10);
     const h = Math.max(1, Math.floor(sourceImg.height / sourceImg.width * w));
 
+    // 关键改变：使用原生分辨率绘制，让 pixelate 基于单元格聚合像素
+    // 每个单元格会覆盖原图的多个像素，取其代表色（dominant/average）
     const off = document.createElement('canvas');
-    off.width = w;
-    off.height = h;
+    off.width = sourceImg.width;
+    off.height = sourceImg.height;
 
     const ctx = off.getContext('2d');
 
-    // 关键：关闭缩放平滑，防止图像被糊掉
-    ctx.imageSmoothingEnabled = false;
+    // 使用高质量缩放绘制原图到原生分辨率画布
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(sourceImg, 0, 0, sourceImg.width, sourceImg.height);
 
-    ctx.drawImage(sourceImg, 0, 0, w, h);
+    // 获取像素化模式（默认使用 dominant 主色模式，效果最干净）
+    const pixelMode = document.getElementById('pixel-mode')?.value || 'dominant';
 
-    const rawImageData = ctx.getImageData(0, 0, w, h);
-
-    // 使用当前配色系统，不改变色库逻辑
-    currentMatrix = converter.applyDithering(rawImageData, w, h, {
-        palette: currentPalette,
-        diffusion: 0.28,
-        dither: true
-    });
+    // 使用单元格聚合算法：将原图分成 N×M 个单元格，每个单元格取代表色
+    currentMatrix = converter.pixelate(
+        ctx,
+        sourceImg.width,
+        sourceImg.height,
+        w,
+        h,
+        currentPalette,
+        pixelMode
+    );
 
     // 轻微去孤点，不做强平滑
     currentMatrix = denoiseMatrix(currentMatrix, POST_DENOISE_PASSES);
@@ -1215,7 +1221,7 @@ mergeThreshold?.addEventListener('input', e => {
     }
 });
 
-document.getElementById('merge-minus')?.addEventListener('click', () => {
+document.getElementById('merge-step-down')?.addEventListener('click', () => {
     if (!mergeThreshold) return;
 
     const val = Math.max(0, parseInt(mergeThreshold.value || '0', 10) - 1);
@@ -1226,7 +1232,7 @@ document.getElementById('merge-minus')?.addEventListener('click', () => {
     }
 });
 
-document.getElementById('merge-plus')?.addEventListener('click', () => {
+document.getElementById('merge-step-up')?.addEventListener('click', () => {
     if (!mergeThreshold) return;
 
     const val = Math.min(100, parseInt(mergeThreshold.value || '0', 10) + 1);
@@ -1250,11 +1256,11 @@ document.getElementById('btn-denoise')?.addEventListener('click', () => {
     refreshAll();
 });
 
-document.getElementById('btn-auto-bg')?.addEventListener('click', () => {
+document.getElementById('btn-bg-remove')?.addEventListener('click', () => {
     autoRemoveBackground();
 });
 
-document.getElementById('btn-reset-excluded')?.addEventListener('click', () => {
+document.getElementById('btn-reset-exclude')?.addEventListener('click', () => {
     excludedColors.clear();
     syncPaletteAndConverter(true);
 });

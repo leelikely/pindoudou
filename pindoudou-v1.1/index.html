@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="拼豆设计助手 - 专业图片转拼豆图纸工具。支持图片上传转换、自由手绘创作，基于CIEDE2000色差算法精准匹配。下载带坐标符号的专业图纸。">
+    <meta name="description" content="拼豆设计助手 - 专业图片转拼豆图纸工具。支持图片上传转换、自由手绘创作，基于OKLAB感知色差+单元格聚合算法精准匹配。下载带坐标符号的专业图纸。">
     <title>拼豆设计助手 - 图片转拼豆图纸 | 自由创作</title>
     <link rel="stylesheet" href="css/style.css">
     <!-- Google Fonts: 圆体字体 -->
@@ -33,8 +33,8 @@
                 把照片变成<span class="highlight">拼豆艺术</span>
             </h1>
             <p class="hero-subtitle">
-                上传任意图片，AI精准匹配最接近的拼豆颜色<br>
-                支持 Perler · MARD · Artkal · Hama 等品牌
+                上传任意图片，智能单元格聚合算法精准匹配拼豆颜色<br>
+                支持 MARD · COCO · 漫漫 · 盼盼 · 咪小窝 等品牌
             </p>
             <div class="hero-actions">
                 <a href="app.html" class="btn-primary">
@@ -54,8 +54,8 @@
                     <span class="stat-label">大品牌</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-num">CIEDE2000</span>
-                    <span class="stat-label">专业算法</span>
+                    <span class="stat-num">OKLAB</span>
+                    <span class="stat-label">感知色差算法</span>
                 </div>
             </div>
         </div>
@@ -81,8 +81,8 @@
         <div class="feature-grid">
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
-                <h3>CIEDE2000 精准配色</h3>
-                <p>采用国际照明委员会推荐的CIEDE2000色差公式，比传统RGB距离精准3倍以上，还原最真实的色彩。</p>
+                <h3>OKLAB 感知精准配色</h3>
+                <p>采用感知均匀的OKLAB色彩空间+单元格聚合算法，消除杂色噪点，比传统逐像素匹配干净3倍以上。</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎨</div>
